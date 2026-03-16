@@ -39,8 +39,9 @@ export default function UrlSummarizerPage() {
 
       setSummary(data.summary);
       setTitle(data.title);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(message);
       console.error(err);
     } finally {
       setIsSummarizing(false);

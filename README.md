@@ -1,4 +1,13 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). It features an AI-powered summarizer for YouTube videos, images, and web articles.
+
+## Supabase OAuth Setup
+
+To make the Google and GitHub sign-in work, you need to:
+
+1.  **Configure Providers**: In your Supabase Dashboard, go to `Authentication > Providers` and enable **Google** and **GitHub**.
+2.  **Redirect URL**: Add `http://localhost:3000/auth/callback` (for local dev) and `https://ai-image-and-youtube-summarizer.vercel.app/auth/callback` (for production) to your allowed redirect URLs in Supabase settings.
+3.  **Client IDs**: Provide the respective Client IDs and Secrets from Google Cloud Console and GitHub Developer Settings into your Supabase project.
+
 
 ## Getting Started
 

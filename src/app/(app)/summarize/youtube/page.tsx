@@ -37,8 +37,9 @@ export default function YouTubeSummarizerPage() {
       }
 
       setSummary(data.summary);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(message);
       console.error(err);
     } finally {
       setIsSummarizing(false);

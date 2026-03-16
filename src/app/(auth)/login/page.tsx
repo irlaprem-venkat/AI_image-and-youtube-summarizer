@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,11 +11,55 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Github, Loader2, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [activeTab, setActiveTab] = useState<string>("signin");
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "oauth_error") {
+      setErrorMsg("Failed to authenticate with the chosen provider. Please try again.");
+    } else if (error === "unauthorized") {
+      setErrorMsg("Please sign in to access the AI summarizer.");
+    } else if (error) {
+      // Allow specific Supabase error messages while sanitizing others
+      const safeErrors = ["Invalid login credentials", "Email not confirmed", "User already registered"];
+      if (safeErrors.some(se => error.toLowerCase().includes(se.toLowerCase()))) {
+        setErrorMsg(error);
+      } else {
+        setErrorMsg("An error occurred during authentication.");
+      }
+    }
+  }, [searchParams]);
+
+  const handleOAuthSignIn = async (provider: "google" | "github") => {
+    setIsLoading(true);
+    setErrorMsg("");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : `Failed to sign in with ${provider}`;
+      setErrorMsg(message);
+      setIsLoading(false);
+    }
+  };
 
   const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,8 +91,9 @@ export default function LoginPage() {
         // On success, either redirect or show verification message
         router.push("/dashboard"); 
       }
-    } catch (error: any) {
-      setErrorMsg(error.message || "Authentication failed");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Authentication failed";
+      setErrorMsg(message);
     } finally {
       setIsLoading(false);
     }
@@ -189,10 +234,20 @@ export default function LoginPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="w-full bg-secondary/30 border-border/50 hover:bg-secondary/80 gap-2" disabled={isLoading}>
+            <Button
+              variant="outline"
+              className="w-full bg-secondary/30 border-border/50 hover:bg-secondary/80 gap-2"
+              disabled={isLoading}
+              onClick={() => handleOAuthSignIn("github")}
+            >
               <Github className="h-4 w-4" /> Github
             </Button>
-            <Button variant="outline" className="w-full bg-secondary/30 border-border/50 hover:bg-secondary/80 gap-2" disabled={isLoading}>
+            <Button
+              variant="outline"
+              className="w-full bg-secondary/30 border-border/50 hover:bg-secondary/80 gap-2"
+              disabled={isLoading}
+              onClick={() => handleOAuthSignIn("google")}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>

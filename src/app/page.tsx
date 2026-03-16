@@ -144,8 +144,7 @@ export default function LandingPage() {
               <div className="p-4 bg-primary/10 text-primary rounded-2xl w-fit mb-6">
                 <FileText className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-foreground">Long-form Text</h3>
-              <p className="text-muted-foreground leading-relaxed">Paste massive walls of text, emails, or chat logs. Select from modes like 'TLDR', 'Study Notes', or 'Key Insights'.</p>
+              <p className="text-muted-foreground leading-relaxed">Paste massive walls of text, emails, or chat logs. Select from modes like &apos;TLDR&apos;, &apos;Study Notes&apos;, or &apos;Key Insights&apos;.</p>
             </div>
           </div>
         </div>
@@ -185,7 +184,7 @@ export default function LandingPage() {
                   <span className="text-primary font-bold">#</span> Concept: React Server Components <br/><br/>
                   <span className="text-primary font-bold">-</span> Definition: Components that render entirely on the server. <br/>
                   <span className="text-primary font-bold">-</span> Benefit: Zero javascript sent to client. Improves page load significantly. <br/>
-                  <span className="text-primary font-bold">-</span> Usage: By default in Next.js App Router unless marked with 'use client'. <br/><br/>
+                  <span className="text-primary font-bold">-</span> Usage: By default in Next.js App Router unless marked with &apos;use client&apos;. <br/><br/>
                   <div className="animate-pulse bg-primary/30 w-2 h-4 inline-block ml-1" />
                 </div>
               </div>

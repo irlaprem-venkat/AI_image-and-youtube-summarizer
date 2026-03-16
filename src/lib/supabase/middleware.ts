@@ -35,13 +35,23 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith('/dashboard')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  // Protected routes: dashboard, summarize, and AI APIs
+  const isProtectedRoute = 
+    request.nextUrl.pathname.startsWith('/dashboard') || 
+    request.nextUrl.pathname.startsWith('/summarize') ||
+    request.nextUrl.pathname.startsWith('/api/summarize')
+
+  if (isProtectedRoute && !user) {
+    if (request.nextUrl.pathname.startsWith('/api/')) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+    
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('error', 'unauthorized')
     return NextResponse.redirect(url)
   }
 
