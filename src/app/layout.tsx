@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 
 export const metadata: Metadata = {
   title: "OmniSummarize AI",
@@ -27,8 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen selection:bg-primary/30`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-foreground min-h-screen selection:bg-primary/30`}
       >
+        <AnimatedBackground />
         <TooltipProvider>
           {children}
         </TooltipProvider>

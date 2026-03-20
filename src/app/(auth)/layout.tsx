@@ -11,11 +11,8 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
-      {/* Immersive background glow effects */}
-      <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-50 animate-pulse pointer-events-none mix-blend-screen" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl opacity-50 animate-pulse pointer-events-none mix-blend-screen" />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Immersive background glow effects (Replaced by AnimatedBackground) */}
       
       <div className="relative z-10 w-full max-w-md px-4 sm:px-0">
         <div className="flex flex-col items-center justify-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">

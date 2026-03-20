@@ -6,11 +6,8 @@ import { Sparkles, Youtube, Image as ImageIcon, Globe, FileText, ArrowRight, Che
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden selection:bg-primary/30 relative">
-      {/* Background Effects */}
-      <div className="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-primary/20 via-primary/5 to-transparent pointer-events-none" />
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+    <div className="min-h-screen text-foreground overflow-hidden selection:bg-primary/30 relative">
+      {/* Background Effects (Replaced by AnimatedBackground) */}
 
       {/* Navigation */}
       <header className="fixed top-0 inset-x-0 z-50 border-b border-border/50 bg-background/50 backdrop-blur-xl">
@@ -152,7 +149,6 @@ export default function LandingPage() {
       
       {/* Smart Modes */}
       <section className="py-24 px-6 relative">
-        <div className="absolute top-[10%] left-[20%] w-[30%] h-[60%] bg-primary/10 blur-[150px] rounded-full pointer-events-none" />
         <div className="container mx-auto max-w-5xl">
           <div className="flex flex-col md:flex-row items-center gap-16">
             <div className="md:w-1/2 space-y-6">
