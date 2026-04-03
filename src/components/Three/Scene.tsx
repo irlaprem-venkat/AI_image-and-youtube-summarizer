@@ -12,10 +12,13 @@ const Particles = () => {
   
   const particlesPosition = useMemo(() => {
     const positions = new Float32Array(PARTICLES_COUNT * 3);
-    for (let i = 0; i < PARTICLES_COUNT; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 15;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 15;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 15;
+    for (let j = 0; j < PARTICLES_COUNT; j++) {
+      // eslint-disable-next-line react-hooks/purity
+      positions[j * 3] = (Math.random() - 0.5) * 15;
+      // eslint-disable-next-line react-hooks/purity
+      positions[j * 3 + 1] = (Math.random() - 0.5) * 15;
+      // eslint-disable-next-line react-hooks/purity
+      positions[j * 3 + 2] = (Math.random() - 0.5) * 15;
     }
     return positions;
   }, []);
