@@ -19,6 +19,25 @@ export async function extractYoutubeTranscript(url: string): Promise<string> {
         console.warn(`[YouTube] Library failed, attempting robust manual fallback: ${libraryError.message}`);
     }
 
+    // NEW: Fallback to YouTube Data API (Title + Description) if transcript fails
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    if (apiKey) {
+        try {
+            console.log(`[YouTube] Attempting Data API fallback...`);
+            const apiResponse = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`);
+            if (apiResponse.ok) {
+                const data = await apiResponse.json();
+                const snippet = data.items?.[0]?.snippet;
+                if (snippet) {
+                    console.log(`[YouTube] Data API success! Using Video Title + Description.`);
+                    return `VIDEO TITLE: ${snippet.title}\n\nVIDEO DESCRIPTION: ${snippet.description}`;
+                }
+            }
+        } catch (apiError: any) {
+            console.warn(`[YouTube] Data API fallback failed: ${apiError.message}`);
+        }
+    }
+
     // 2. Manual Fallback Scraper (InnerTube API / HTML Scraping)
     try {
         const videoPageResponse = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
