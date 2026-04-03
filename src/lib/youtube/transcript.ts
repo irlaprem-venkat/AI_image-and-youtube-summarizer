@@ -1,23 +1,60 @@
 import { YoutubeTranscript } from 'youtube-transcript';
 
-export async function extractYoutubeTranscript(videoUrl: string): Promise<string> {
+/**
+ * Normalizes a YouTube URL to a standard format for the transcript library.
+ * Handles youtu.be, shorts, and URLs with tracking parameters.
+ */
+function normalizeYoutubeUrl(url: string): string {
   try {
-    // Basic validation
-    if (!videoUrl.includes('youtube.com') && !videoUrl.includes('youtu.be')) {
+    const parsedUrl = new URL(url);
+    let videoId = '';
+
+    if (parsedUrl.hostname === 'youtu.be') {
+      videoId = parsedUrl.pathname.slice(1);
+    } else if (parsedUrl.hostname.includes('youtube.com')) {
+      if (parsedUrl.pathname.startsWith('/shorts/')) {
+        videoId = parsedUrl.pathname.split('/')[2];
+      } else {
+        videoId = parsedUrl.searchParams.get('v') || '';
+      }
+    }
+
+    if (!videoId) return url; // Fallback to original if can't parse ID
+    
+    // Using a clean standard URL often helps libraries find the right metadata
+    return `https://www.youtube.com/watch?v=${videoId}`;
+  } catch (e) {
+    return url;
+  }
+}
+
+export async function extractYoutubeTranscript(videoUrl: string): Promise<string> {
+  const cleanUrl = normalizeYoutubeUrl(videoUrl);
+  
+  try {
+    if (!cleanUrl.includes('youtube.com') && !cleanUrl.includes('youtu.be')) {
       throw new Error("Invalid YouTube URL");
     }
 
-    // Fetch the transcript
-    const transcriptLines = await YoutubeTranscript.fetchTranscript(videoUrl);
+    // Try fetching the transcript
+    // We try with auto-generated English hints if the base fetch fails
+    let transcriptLines;
+    try {
+      transcriptLines = await YoutubeTranscript.fetchTranscript(cleanUrl);
+    } catch (initialError) {
+      console.warn("Initial transcript fetch failed, trying with English language hint...", initialError);
+      try {
+        transcriptLines = await YoutubeTranscript.fetchTranscript(cleanUrl, { lang: 'en' });
+      } catch (retryError) {
+        throw initialError; // Re-throw original error if retry also fails
+      }
+    }
     
-    // The library returns an array of objects with 'text', 'duration', and 'offset'
-    // For basic summarization, we just need to concatenate the text.
-    // We clean up common artifact strings like [Music] or [Laughter] which aren't useful for summaries.
     const fullText = transcriptLines
       .map(line => line.text)
-      .filter(text => !text.startsWith('[') && !text.endsWith(']')) // Naive filter for closed caption tags
+      .filter(text => !text.startsWith('[') && !text.endsWith(']')) 
       .join(' ')
-      .replace(/\s+/g, ' ') // Clean up multiple spaces
+      .replace(/\s+/g, ' ') 
       .trim();
 
     if (!fullText || fullText.length < 50) {
@@ -26,11 +63,15 @@ export async function extractYoutubeTranscript(videoUrl: string): Promise<string
 
     return fullText;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to extract YouTube transcript:", error);
-    if (error instanceof Error) {
-      throw new Error(`Transcript extraction failed: ${error.message}`);
+    
+    // Provide a more helpful user-facing error message
+    let message = error.message;
+    if (message.includes("Transcript is disabled")) {
+      message = "YouTube returned a 'disabled' status for transcripts on this video. If you see captions on YouTube, try refreshing or pasting the link again. Some video regions or types are harder for automated tools to access.";
     }
-    throw new Error("Failed to extract YouTube transcript due to an unknown error.");
+
+    throw new Error(`Transcript extraction failed: ${message}`);
   }
 }
